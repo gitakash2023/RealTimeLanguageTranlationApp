@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "431170090120",
+    "project_id": "language-translation-app-842c1",
+    "storage_bucket": "language-translation-app-842c1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431170090120:android:875584e8bd5695c3035b3d",
+        "android_client_info": {
+          "package_name": "com.realtimelanguagetranlationapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVUmNY8QyIJ1L4EyI9q0fjdhuECWqt71Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

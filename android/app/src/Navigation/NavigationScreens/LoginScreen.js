@@ -8,19 +8,36 @@ import {
   Button,
 } from 'react-native';
 import React, {useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 const LoginScreen = () => {
+  // for navigation
+  const navigation = useNavigation();
+// use input phone number
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [validatemsg,setvalidatemsg]=useState('')
+  // If null, no SMS has been sent
+  const [confirm, setConfirm] = useState(null);
+
   //  function for handleCancelIcon
   const handleCancelIconPress = () => {
     setPhoneNumber('');
   };
   // function  for handleSendcode
-  const handleSendcode = () => {
-   
+  const handleSendcode = async () => {
+    try {
+      console.log('button clicked');
+      const confirmation = await auth().signInWithPhoneNumber(
+        `+91${phoneNumber}`,
+      );
+      setConfirm(confirmation);
+      navigation.navigate('VerifyOTPScreen');
 
-
+      setPhoneNumber('');
+    } catch (error) {
+      console.log('Failed to send OTP');
+      setPhoneNumber('');
+    }
   };
   return (
     <View style={styles.container}>
@@ -70,11 +87,11 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-    
+
       <View style={styles.sendcodeView}>
-        <TouchableOpacity 
-        
-        style={styles.sendcodeButton} onPress={handleSendcode}>
+        <TouchableOpacity
+          style={styles.sendcodeButton}
+          onPress={handleSendcode}>
           <Text style={styles.sendcodeText}>Send code</Text>
         </TouchableOpacity>
       </View>
@@ -119,16 +136,15 @@ const styles = StyleSheet.create({
     height: 40,
   },
   sendcodeButton: {
-    margin:10,
+    margin: 10,
     marginTop: 20,
     backgroundColor: '#5dd55d',
-    borderRadius:5
-
+    borderRadius: 5,
   },
   sendcodeText: {
     padding: 15,
     textAlign: 'center',
-    color:"white",
+    color: 'white',
     fontWeight: 'normal',
     fontFamily: 'Roboto',
   },
