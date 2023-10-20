@@ -31,11 +31,11 @@ const LoginScreen = () => {
         `+91${phoneNumber}`,
       );
       setConfirm(confirmation);
-      navigation.navigate('VerifyOTPScreen');
+      navigation.navigate('HomeScreen');
 
       setPhoneNumber('');
     } catch (error) {
-      console.log('Failed to send OTP');
+      console.log(error);
       setPhoneNumber('');
     }
   };

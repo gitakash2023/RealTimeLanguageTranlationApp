@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text ,Image,StyleSheet} from 'react-native'
 import React,{useEffect}from 'react'
 import { useNavigation } from '@react-navigation/native';
 
@@ -13,9 +13,20 @@ const Splash = () => {
       }, []);
   return (
     <View>
-      <Text>Splash</Text>
+    <View>
+          <Image
+            source={require('../../Image/indiaIcon.jpg')}
+            style={styles.indiaIcon}
+          />
+        </View>
     </View>
   )
 }
+const styles = StyleSheet.create({
+  indiaIcon:{
+    
+  }
+
+})
 
 export default Splash
