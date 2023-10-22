@@ -8,7 +8,7 @@ const Splash = () => {
     useEffect(() => {
         // Simulate a delay (3 seconds) before navigating to the login screen
         setTimeout(() => {
-          navigation.navigate('LoginScreen');
+          navigation.navigate('HomeScreen');
         }, 3000);
       }, []);
   return (
