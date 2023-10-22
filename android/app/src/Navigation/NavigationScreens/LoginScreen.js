@@ -26,11 +26,11 @@ const LoginScreen = () => {
   // function  for handleSendcode
   const handleSendcode = async () => {
     try {
-      console.log('button clicked');
-      const confirmation = await auth().signInWithPhoneNumber(
-        `+91${phoneNumber}`,
-      );
-      setConfirm(confirmation);
+      // console.log('button clicked');
+      // const confirmation = await auth().signInWithPhoneNumber(
+      //   `+91 ${phoneNumber}`,
+      // );
+      // setConfirm(confirmation);
       navigation.navigate('HomeScreen');
 
       setPhoneNumber('');
@@ -38,6 +38,13 @@ const LoginScreen = () => {
       console.log(error);
       setPhoneNumber('');
     }
+    // auth().createUserWithEmailAndPassword("akash1787@gmail.com","123456").then(res=>{
+    //   console.log(res)
+    //   console.log("clicked")
+    // })
+    // .catch(error=>{
+    //   console.log(error)
+    // })
   };
   return (
     <View style={styles.container}>
