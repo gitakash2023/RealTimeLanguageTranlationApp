@@ -6,6 +6,7 @@ import LoginScreen from './NavigationScreens/LoginScreen';
 import HomeScreen from './NavigationScreens/HomeScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import VerifyOTPScreen from './NavigationScreens/VerifyOTPScreen';
+import HistoryScreen from './NavigationScreens/HistoryScreen';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,8 @@ const Navigation = () => {
       <Stack.Screen name="VerifyOTPScreen" component={VerifyOTPScreen}  options={{ headerShown: false }} />
       <Stack.Screen name="LoginScreen" component={LoginScreen}   options={{ headerShown: false }}/>
       <Stack.Screen name="HomeScreen" component={HomeScreen}   options={{ headerShown: false }}/>
+      <Stack.Screen name="HistoryScreen" component={HistoryScreen}  />
+
     </Stack.Navigator>
     </NavigationContainer>
   );
