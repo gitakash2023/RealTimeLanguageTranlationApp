@@ -3,6 +3,11 @@ import { View, Text, FlatList, StyleSheet } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
+
+
+// If you've installed from GitHub, do:
+const translate = require('google-translate');
+
 const HistoryScreen = () => {
     const [historyData, setHistoryData] = useState([]);
 //  
@@ -38,14 +43,13 @@ useEffect(() => {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.historyItem}>
-            <Text style={styles.label}>From: {item.from}</Text>
-            <Text style={styles.label}>Input Text: {item.inputText}</Text>
-            <Text style={styles.label}>To: {item.to}</Text>
-            <Text style={styles.label}>Translated Text: {item.translatedText}</Text>
-            <Text style={styles.label}>User ID: {item.userId}</Text>
-            <Text style={styles.label}>
-              Created At: {item.createdAt.toDate().toString()}
+          <Text style={styles.label}>
+               {item.createdAt.toDate().toString()}
             </Text>
+            <Text style={styles.label}>{item.inputText}</Text>
+           
+            <Text style={styles.label}>{item.translatedText}</Text>
+            
           </View>
         )}
       />
@@ -56,9 +60,9 @@ useEffect(() => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+   marginLeft:10,
     backgroundColor: 'white',
-    padding: 16,
+    padding: 5,
   },
   title: {
     fontSize: 24,
@@ -67,9 +71,6 @@ const styles = StyleSheet.create({
   },
   historyItem: {
     backgroundColor: 'white',
-    borderWidth:1,
-    borderRadius: 10,
-    padding: 16,
     marginBottom: 16,
     
   

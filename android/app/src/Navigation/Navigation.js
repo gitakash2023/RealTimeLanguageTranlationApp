@@ -5,8 +5,8 @@ import Splash from './NavigationScreens/Splash';
 import LoginScreen from './NavigationScreens/LoginScreen';
 import HomeScreen from './NavigationScreens/HomeScreen';
 import { NavigationContainer } from '@react-navigation/native';
-import VerifyOTPScreen from './NavigationScreens/VerifyOTPScreen';
 import HistoryScreen from './NavigationScreens/HistoryScreen';
+import SignupScreen from './NavigationScreens/SignupScreen';
 
 const Stack = createStackNavigator();
 
@@ -15,8 +15,9 @@ const Navigation = () => {
     <NavigationContainer>
     <Stack.Navigator>
       <Stack.Screen name="Splash" component={Splash}   options={{ headerShown: false }}/>
-      <Stack.Screen name="VerifyOTPScreen" component={VerifyOTPScreen}  options={{ headerShown: false }} />
       <Stack.Screen name="LoginScreen" component={LoginScreen}   options={{ headerShown: false }}/>
+      <Stack.Screen name="SignupScreen" component={SignupScreen}   options={{ headerShown: false }}/>
+
       <Stack.Screen name="HomeScreen" component={HomeScreen}   options={{ headerShown: false }}/>
       <Stack.Screen name="HistoryScreen" component={HistoryScreen}  />
 
