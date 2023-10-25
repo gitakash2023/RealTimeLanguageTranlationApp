@@ -11,14 +11,12 @@ import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
-const LoginScreen = () => {
+const SignupScreen = () => {
   // for navigation
   const navigation = useNavigation();
-  // use input phone number
+  // 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // If null, no SMS has been sent
-  const [confirm, setConfirm] = useState(null);
 
   //  function for handleCancelIconEmail
   const handleCancelIconPressEmail = () => {
@@ -28,13 +26,27 @@ const LoginScreen = () => {
   const handleCancelIconPressPassword = () => {
     setPassword('');
   };
-  // function  for handleLogin
-  const handleLogin = () => {
+  // handleLoginNow
+  const navigateToLoginScreen = () => {
+    navigation.navigate('LoginScreen');
+  };
+  // function  for handleSignup
+  const handleSignup = () => {
+    console.log("clicked")
     auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        console.log('Welcome ');
+      .createUserWithEmailAndPassword(email, password)
+      .then((res) => {
+        console.log('User account created & signed in!' );
+        console.log(res)
+
+        // // navigate to the Login screen after 2 seconds
+        // setTimeout(() => {
+        //   navigation.navigate('Login');
+        // }, 2000); // 2seconds
+
         navigation.navigate('HomeScreen');
+        setEmail('');
+        setPassword('');
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
@@ -44,18 +56,17 @@ const LoginScreen = () => {
         if (error.code === 'auth/invalid-email') {
           console.log('That email address is invalid!');
         }
-
+        setEmail('');
+        setPassword('');
         console.error(error);
       });
   };
-  const navigateToSignup = () => {
-    navigation.navigate('SignupScreen');
-  };
+
   return (
     <View style={styles.container}>
       <View style={styles.main}>
         <Text style={styles.text}>Condidate</Text>
-        <Text style={styles.text}> Sign-In</Text>
+        <Text style={styles.text}> Sign-up</Text>
       </View>
       <View>
         <Image
@@ -104,14 +115,14 @@ const LoginScreen = () => {
       </View>
 
       <View style={styles.LoginView}>
-        <TouchableOpacity style={styles.LoginButton} onPress={handleLogin}>
-          <Text style={styles.LoginText}>Log in</Text>
+        <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
+          <Text style={styles.signupText}>Sign up</Text>
         </TouchableOpacity>
       </View>
       <View>
-        <TouchableOpacity onPress={navigateToSignup}>
-          <Text style={styles.RegisterText}>
-            Don't have a clarity account ? Register now
+        <TouchableOpacity onPress={navigateToLoginScreen}>
+          <Text style={styles.LoginText}>
+            Already have an account ? Login here !
           </Text>
         </TouchableOpacity>
       </View>
@@ -156,24 +167,24 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
-  LoginButton: {
+  signupButton: {
     margin: 10,
     marginTop: 20,
     backgroundColor: 'black',
     borderRadius: 5,
   },
-  LoginText: {
+  signupText: {
     padding: 15,
     textAlign: 'center',
     color: 'white',
     fontWeight: 'normal',
     fontFamily: 'Roboto',
   },
-  RegisterText: {
+  LoginText: {
     textAlign: 'center',
     marginTop: 20,
     fontWeight: 'bold',
   },
 });
 
-export default LoginScreen;
+export default SignupScreen;

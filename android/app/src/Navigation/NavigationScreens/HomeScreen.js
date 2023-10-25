@@ -7,160 +7,133 @@ import {
   Modal,
   TouchableOpacity,
   Image,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {translate} from '@vitalets/google-translate-api';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [text, setText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
-  const [fromLanguage, setFromLanguage] = useState('English');
-  const [toLanguage, setToLanguage] = useState('Hindi');
+  const [fromLanguage, setFromLanguage] = useState('en');
+  const [toLanguage, setToLanguage] = useState('hi');
   const [isFromModalVisible, setFromModalVisible] = useState(false);
   const [isToModalVisible, setToModalVisible] = useState(false);
- 
-  const availableLanguages = [
-    'English',
-    'Spanish',
-    'French',
-    'German',
-    'Italian',
-    'Portuguese',
-    'Dutch',
-    'Swedish',
-    'Norwegian',
-    'Danish',
-    'Finnish',
-    'Russian',
-    'Arabic',
-    'Chinese (Simplified)',
-    'Chinese (Traditional)',
-    'Japanese',
-    'Korean',
-    'Greek',
-    'Turkish',
-    'Hebrew',
-    'Hindi',
-    'Bengali',
-    'Punjabi',
-    'Urdu',
-    'Tamil',
-    'Telugu',
-    'Marathi',
-    'Kannada',
-    'Malayalam',
-    'Thai',
-    'Vietnamese',
-    'Indonesian',
-    'Malay',
-    'Filipino',
-    'Burmese',
-    'Lao',
-    'Khmer',
-    'Nepali',
-    'Sinhala',
-    'Bhutanese',
-    'Tibetan',
-    'Mongolian',
-    'Uighur',
-    'Tajik',
-    'Kazakh',
-    'Turkmen',
-    'Uzbek',
-    'Kyrgyz',
-    'Tatar',
-    'Bashkir',
-    'Chuvash',
-    'Armenian',
-    'Georgian',
-    'Azerbaijani',
-    'Tamil',
-    'Malayalam',
-    'Sanskrit',
-    'Kannada',
-    'Marathi',
-    'Gujarati',
-    'Punjabi',
-    'Bengali',
-    'Oriya',
-    'Assamese',
-    'Maithili',
-    'Nepali',
-    'Kashmiri',
-    'Sindhi',
-    'Uighur',
-    'Tibetan',
-    'Mongolian',
-    'Manchurian',
-    'Tatar',
-    'Bashkir',
-    'Chuvash',
-    'Yakut',
-    'Komi',
-    'Moksha',
-    'Udmurt',
-    'Mari',
-    'Komi-Permyak',
-    'Erzya',
-    'Moksha',
-    'Udmurt',
-    'Karelian',
-    'Finnish',
-    'Estonian',
-    'Latvian',
-    'Lithuanian',
-    'Polish',
-    'Czech',
-    'Slovak',
-    'Slovenian',
-    'Croatian',
-    'Bosnian',
-    'Serbian',
-    'Montenegrin',
-    'Macedonian',
-    'Albanian',
-  ];
-  
-  
+
+  const availableLanguages = {
+    auto: 'Automatic',
+    af: 'Afrikaans',
+    sq: 'Albanian',
+    am: 'Amharic',
+    ar: 'Arabic',
+    hy: 'Armenian',
+    az: 'Azerbaijani',
+    eu: 'Basque',
+    be: 'Belarusian',
+    bn: 'Bengali',
+    bs: 'Bosnian',
+    bg: 'Bulgarian',
+    ca: 'Catalan',
+    ceb: 'Cebuano',
+    ny: 'Chichewa',
+    'zh-cn': 'Chinese Simplified',
+    'zh-tw': 'Chinese Traditional',
+    co: 'Corsican',
+    hr: 'Croatian',
+    cs: 'Czech',
+    da: 'Danish',
+    nl: 'Dutch',
+    en: 'English',
+    eo: 'Esperanto',
+    et: 'Estonian',
+    tl: 'Filipino',
+    fi: 'Finnish',
+    fr: 'French',
+    fy: 'Frisian',
+    gl: 'Galician',
+    ka: 'Georgian',
+    de: 'German',
+    el: 'Greek',
+    gu: 'Gujarati',
+    ht: 'Haitian Creole',
+    ha: 'Hausa',
+    haw: 'Hawaiian',
+    iw: 'Hebrew',
+    hi: 'Hindi',
+    hmn: 'Hmong',
+    hu: 'Hungarian',
+    is: 'Icelandic',
+    ig: 'Igbo',
+    id: 'Indonesian',
+    ga: 'Irish',
+    it: 'Italian',
+    ja: 'Japanese',
+    jw: 'Javanese',
+    kn: 'Kannada',
+    kk: 'Kazakh',
+    km: 'Khmer',
+    ko: 'Korean',
+    ku: 'Kurdish (Kurmanji)',
+    ky: 'Kyrgyz',
+    lo: 'Lao',
+    la: 'Latin',
+    lv: 'Latvian',
+    lt: 'Lithuanian',
+    lb: 'Luxembourgish',
+    mk: 'Macedonian',
+    mg: 'Malagasy',
+    ms: 'Malay',
+    ml: 'Malayalam',
+    mt: 'Maltese',
+    mi: 'Maori',
+    mr: 'Marathi',
+    mn: 'Mongolian',
+    my: 'Myanmar (Burmese)',
+    ne: 'Nepali',
+    no: 'Norwegian',
+    ps: 'Pashto',
+    fa: 'Persian',
+    pl: 'Polish',
+    pt: 'Portuguese',
+    ma: 'Punjabi',
+    ro: 'Romanian',
+    ru: 'Russian',
+    sm: 'Samoan',
+    gd: 'Scots Gaelic',
+    sr: 'Serbian',
+    st: 'Sesotho',
+    sn: 'Shona',
+    sd: 'Sindhi',
+    si: 'Sinhala',
+    sk: 'Slovak',
+    sl: 'Slovenian',
+    so: 'Somali',
+    es: 'Spanish',
+    su: 'Sundanese',
+    sw: 'Swahili',
+    sv: 'Swedish',
+    tg: 'Tajik',
+    ta: 'Tamil',
+    te: 'Telugu',
+    th: 'Thai',
+    tr: 'Turkish',
+    uk: 'Ukrainian',
+    ur: 'Urdu',
+    uz: 'Uzbek',
+    vi: 'Vietnamese',
+    cy: 'Welsh',
+    xh: 'Xhosa',
+    yi: 'Yiddish',
+    yo: 'Yoruba',
+    zu: 'Zulu',
+  };
+
   //  function for set user
-  function setUserData() {
-    // firestore()
-    //   .collection('translations')
-    //   .add({
-    //     to:toLanguage ,
-    //     from:fromLanguage ,
-    //     inputText: text,
-    //     translatedText: translatedText,
-    //     createdAt: new Date(),
-    //     userId: auth().currentUser.email,
-    //   })
-    //   .then(() => {
-    //     console.log('User added!');
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
-    firestore()
-      .collection('translations')
-      .add({
-        to:"english" ,
-        from:"Hindi" ,
-        inputText: "bhai tum bahut harami ho",
-        translatedText: "han mai harami hu ",
-        createdAt: new Date(),
-        userId: auth().currentUser.email,
-      })
-      .then(() => {
-        console.log('User added!');
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }
+
   // const fetchUserTranslations = () => {
   //   firestore()
   //     .collection('students')
@@ -178,56 +151,112 @@ const HomeScreen = () => {
   //   setUserData();
   // }, []);
   //  handleTranslate
-  const handleTranslate = () => {};
- 
+  const handleTranslate = async () => {
+    const result = await translate(text, {from: 'en', to: 'hi'});
+    setTranslatedText(result.text);
+
+    firestore()
+      .collection('translations')
+      .add({
+        to: toLanguage, // You can specify the target language here
+        from: fromLanguage, // You can specify the source language here
+        inputText: text,
+        translatedText: result.text,
+        createdAt: new Date(),
+        userId: auth().currentUser.email,
+      })
+      .then(() => {
+        console.log('Translation added to Firestore!');
+      })
+      .catch(error => {
+        console.error('Error adding translation to Firestore:', error);
+      });
+
+    setText(''); // Clear the input field after translation
+  };
+
   //  function for open from language
   const openFromLanguageModal = () => {
     setFromModalVisible(true);
   };
-//  function for open to language
+  //  function for open to language
   const openToLanguageModal = () => {
     setToModalVisible(true);
   };
 
   //  function for  FromLanguageSelect
-  const handleFromLanguageSelect = (language) => {
+  const handleFromLanguageSelect = language => {
     setFromLanguage(language);
     setFromModalVisible(false);
   };
-// function for  toLanguageSelect
-  const handleToLanguageSelect = (language) => {
+  // function for  toLanguageSelect
+  const handleToLanguageSelect = language => {
     setToLanguage(language);
     setToModalVisible(false);
   };
   //  function for interchangeLanguages
-  const interchangeLanguages =()=>{
-    setFromLanguage(toLanguage)
-    setToLanguage(fromLanguage)
-  }
-  // 
-  const handleForHistory=()=>{
+  const interchangeLanguages = () => {
+    setFromLanguage(toLanguage);
+    setToLanguage(fromLanguage);
+  };
+  //
+  const handleForHistory = () => {
     navigation.navigate('HistoryScreen');
-  }
-
-  
+  };
+  //  handleLogout
+  const handleLogout = () => {
+    auth()
+      .signOut()
+      .then(res => {
+        navigation.navigate('LoginScreen');
+        console.log('logout', res);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+  //  handleCancel
+  const handleCancel = () => {
+    setText('');
+  };
 
   return (
     <>
-    <TouchableOpacity  onPress={handleForHistory} >
-        <Image
-            source={require('../../Image/historyIcon.jpg')}
+      <View style={styles.topIcons}>
+        <TouchableOpacity onPress={handleForHistory}>
+          <Image
+            source={require('../../Image/historyIcon.png')}
             style={styles.historyIcon}
           />
         </TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout}>
+          <Image
+            source={require('../../Image/logOut.png')}
+            style={styles.logoutButton}
+          />
+        </TouchableOpacity>
+      </View>
       <View style={styles.container}>
         <Text style={styles.title}>Language Translator</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter text "
-          placeholderTextColor="blue"
-          onChangeText={text => setText(text)}
-          value={text}
-        />
+        <View style={{flexDirection: 'row'}}>
+          <View>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter text "
+              placeholderTextColor="black"
+              onChangeText={text => setText(text)}
+              value={text}
+            />
+          </View>
+          <View>
+            <TouchableOpacity onPress={handleCancel}>
+              <Image
+                source={require('../../Image/cancelIcon.png')}
+                style={styles.cancelIcon}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
         <Button title="Translate" onPress={handleTranslate} />
         <Text style={styles.result}>Translated Text: {translatedText}</Text>
       </View>
@@ -238,8 +267,10 @@ const HomeScreen = () => {
           onPress={openFromLanguageModal}>
           <Text>From: {fromLanguage}</Text>
         </TouchableOpacity>
-        <TouchableOpacity  onPress={interchangeLanguages} style={styles.changeIcon}>
-        <Image
+        <TouchableOpacity
+          onPress={interchangeLanguages}
+          style={styles.changeIcon}>
+          <Image
             source={require('../../Image/interchangeIcon.jpg')}
             style={styles.interchangeIcon}
           />
@@ -249,61 +280,63 @@ const HomeScreen = () => {
           onPress={openToLanguageModal}>
           <Text>To: {toLanguage}</Text>
         </TouchableOpacity>
-        
       </View>
-       {/* From Language Selection Modal */}
-       <Modal
+      {/* From Language Selection Modal */}
+      <Modal
         animationType="slide"
         transparent={true}
-        visible={isFromModalVisible}
-       >
+        visible={isFromModalVisible}>
         <View style={styles.modalContainer}>
-        <ScrollView>
-          {availableLanguages.map((language) => (
-            <TouchableOpacity
-              // key={language}
-              style={styles.languageModalButton}
-              onPress={() => handleFromLanguageSelect(language)}
-            >
-              <Text>{language}</Text>
-            </TouchableOpacity>
-          ))}
+          <ScrollView>
+            {Object.keys(availableLanguages).map(language => (
+              <TouchableOpacity
+                key={language}
+                style={styles.languageModalButton}
+                onPress={() => handleFromLanguageSelect(language)}>
+                <Text>{language}</Text>
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
       </Modal>
-       {/* To Language Selection Modal */}
-         <Modal
+      {/* To Language Selection Modal */}
+      <Modal
         animationType="slide"
         transparent={true}
-        visible={isToModalVisible}
-        >
+        visible={isToModalVisible}>
         <View style={styles.modalContainer}>
-        <ScrollView>
-          {availableLanguages.map((language) => (
-            <TouchableOpacity
-              // key={language}
-              style={styles.languageModalButton}
-              onPress={() => handleToLanguageSelect(language)}
-            >
-              <Text  style={styles.languagetext}>{language}</Text>
-            </TouchableOpacity>
-          ))}
+          <ScrollView>
+            {Object.keys(availableLanguages).map(language => (
+              <TouchableOpacity
+                key={language}
+                style={styles.languageModalButton}
+                onPress={() => handleToLanguageSelect(language)}>
+                <Text>{language}</Text>
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
-      </Modal> 
+      </Modal>
     </>
   );
 };
-
 const styles = StyleSheet.create({
-  historyIcon:{
-    height:50,
-    width:50,
-    marginLeft:300,
-    marginTop:20
-  
-    
+  historyIcon: {
+    height: 30,
+    width: 30,
+    marginLeft: 300,
+    marginTop: 20,
   },
+  topIcons: {
+    flexDirection: 'row',
+  },
+  logoutButton: {
+    width: 30,
+    height: 30,
+    marginTop: 20,
+    marginLeft: 30,
+  },
+
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -317,25 +350,27 @@ const styles = StyleSheet.create({
   input: {
     width: 300,
     height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    padding: 10,
+    // borderColor: 'gray',
+    // borderWidth: 1,
+    // padding: 10,
     marginBottom: 10,
     borderRadius: 10,
-   
+  },
+  cancelIcon: {
+    width: 40,
+    height: 40,
   },
   result: {
     fontSize: 18,
     marginTop: 20,
-    color:"black",
+    color: 'black',
   },
   languageSelection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-    marginBottom:20,
-    
+    marginBottom: 20,
   },
   languageButton: {
     padding: 10,
@@ -344,12 +379,11 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderRadius: 5,
   },
-  interchangeIcon:{
-    width:20,
-    height:20,
-   
+  interchangeIcon: {
+    width: 20,
+    height: 20,
   },
- 
+
   modalContainer: {
     backgroundColor: 'white',
     padding: 10,
@@ -360,9 +394,8 @@ const styles = StyleSheet.create({
     margin: 5,
     borderWidth: 1,
     borderColor: 'gray',
-    borderRadius: 5, 
+    borderRadius: 5,
   },
- 
 });
 
 export default HomeScreen;
