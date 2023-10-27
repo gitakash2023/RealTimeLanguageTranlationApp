@@ -6,6 +6,8 @@ import {
   TextInput,
   TouchableOpacity,
   Button,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
@@ -14,9 +16,11 @@ import auth from '@react-native-firebase/auth';
 const SignupScreen = () => {
   // for navigation
   const navigation = useNavigation();
-  // 
+  //
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // Loding
+  const [isLodingSignUp, setIsLodingSignUp] = useState(false);
 
   //  function for handleCancelIconEmail
   const handleCancelIconPressEmail = () => {
@@ -32,17 +36,13 @@ const SignupScreen = () => {
   };
   // function  for handleSignup
   const handleSignup = () => {
-    console.log("clicked")
+    setIsLodingSignUp(true);
     auth()
       .createUserWithEmailAndPassword(email, password)
-      .then((res) => {
-        console.log('User account created & signed in!' );
-        console.log(res)
-
-        // // navigate to the Login screen after 2 seconds
-        // setTimeout(() => {
-        //   navigation.navigate('Login');
-        // }, 2000); // 2seconds
+      .then(res => {
+        console.log('User account created & signed in!');
+        console.log(res);
+        setIsLodingSignUp(false);
 
         navigation.navigate('HomeScreen');
         setEmail('');
@@ -82,19 +82,21 @@ const SignupScreen = () => {
       <View style={styles.inputFieldContainer}>
         <View>
           <TextInput
-            placeholder="Enter Your email"
+            placeholder="Enter Your e-mail "
             value={email}
             onChangeText={text => setEmail(text)}
             style={styles.textInput}></TextInput>
         </View>
-        <View>
-          <TouchableOpacity onPress={handleCancelIconPressEmail}>
-            <Image
-              source={require('../../Image/cancelIcon.png')}
-              style={styles.cancelicon}
-            />
-          </TouchableOpacity>
-        </View>
+        {email.length > 0 && (
+          <View>
+            <TouchableOpacity onPress={handleCancelIconPressEmail}>
+              <Image
+                source={require('../../Image/cancelIcon.png')}
+                style={[styles.cancelicon, {marginLeft: 30}]}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
       <View style={[styles.inputFieldContainer, {marginTop: 10}]}>
         <View>
@@ -104,20 +106,28 @@ const SignupScreen = () => {
             onChangeText={text => setPassword(text)}
             style={styles.textInput}></TextInput>
         </View>
-        <View>
-          <TouchableOpacity onPress={handleCancelIconPressPassword}>
-            <Image
-              source={require('../../Image/cancelIcon.png')}
-              style={styles.cancelicon}
-            />
-          </TouchableOpacity>
-        </View>
+        {password.length > 0 && (
+          <View>
+            <TouchableOpacity onPress={handleCancelIconPressPassword}>
+              <Image
+                source={require('../../Image/cancelIcon.png')}
+                style={styles.cancelicon}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       <View style={styles.LoginView}>
-        <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
-          <Text style={styles.signupText}>Sign up</Text>
-        </TouchableOpacity>
+        {isLodingSignUp ? (
+          // Render an ActivityIndicator when signingUp is true
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          // Render the "Sign up" button when signingUp is false
+          <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
+            <Text style={styles.signupText}>Sign up</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <View>
         <TouchableOpacity onPress={navigateToLoginScreen}>
@@ -156,16 +166,17 @@ const styles = StyleSheet.create({
   inputFieldContainer: {
     flexDirection: 'row',
     marginTop: 50,
-    marginLeft: 20,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginLeft: 30,
   },
   textInput: {
-    marginRight: 100,
+    // marginTop: 15,
   },
   cancelicon: {
     width: 20,
     height: 20,
+    marginRight: 20,
+    marginTop: 15,
   },
   signupButton: {
     margin: 10,

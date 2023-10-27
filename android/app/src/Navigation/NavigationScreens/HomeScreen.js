@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import auth from '@react-native-firebase/auth';
@@ -19,10 +21,12 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [text, setText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
-  const [fromLanguage, setFromLanguage] = useState('en');
-  const [toLanguage, setToLanguage] = useState('hi');
+  const [fromLanguage, setFromLanguage] = useState('auto');
+  const [toLanguage, setToLanguage] = useState('en');
   const [isFromModalVisible, setFromModalVisible] = useState(false);
   const [isToModalVisible, setToModalVisible] = useState(false);
+  const [isLodingTraslate, setIsLodingTranslate] = useState(false);
+  const [isLodingLogout, setIsLodingLogout] = useState(false);
 
   const availableLanguages = {
     auto: 'Automatic',
@@ -152,8 +156,16 @@ const HomeScreen = () => {
   // }, []);
   //  handleTranslate
   const handleTranslate = async () => {
-    const result = await translate(text, {from: 'en', to: 'hi'});
+    if (!text || !fromLanguage || !toLanguage) {
+      Alert.alert('please provide all inputs');
+      return;
+    }
+    setIsLodingTranslate(true);
+
+    const result = await translate(text, {from: fromLanguage, to: toLanguage});
+    setIsLodingTranslate(false);
     setTranslatedText(result.text);
+    setFromLanguage(result.raw.src);
 
     firestore()
       .collection('translations')
@@ -205,9 +217,11 @@ const HomeScreen = () => {
   };
   //  handleLogout
   const handleLogout = () => {
+    setIsLodingLogout(true);
     auth()
       .signOut()
       .then(res => {
+        setIsLodingLogout(false);
         navigation.navigate('LoginScreen');
         console.log('logout', res);
       })
@@ -229,15 +243,21 @@ const HomeScreen = () => {
             style={styles.historyIcon}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogout}>
-          <Image
-            source={require('../../Image/logOut.png')}
-            style={styles.logoutButton}
-          />
-        </TouchableOpacity>
+        <View style={styles.logoutContainer}>
+          {isLodingLogout ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <TouchableOpacity onPress={handleLogout}>
+              <Image
+                source={require('../../Image/logOut.png')}
+                style={styles.logoutButton}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
+
       <View style={styles.container}>
-        <Text style={styles.title}>Language Translator</Text>
         <View style={{flexDirection: 'row'}}>
           <View>
             <TextInput
@@ -246,26 +266,34 @@ const HomeScreen = () => {
               placeholderTextColor="black"
               onChangeText={text => setText(text)}
               value={text}
+              multiline={true} // Enable multiline input
+              numberOfLines={10} // Set the number of lines to control the height
             />
           </View>
-          <View>
-            <TouchableOpacity onPress={handleCancel}>
-              <Image
-                source={require('../../Image/cancelIcon.png')}
-                style={styles.cancelIcon}
-              />
-            </TouchableOpacity>
-          </View>
+          {text.length > 0 && (
+            <View>
+              <TouchableOpacity onPress={handleCancel}>
+                <Image
+                  source={require('../../Image/cancelIcon.png')}
+                  style={styles.cancelIcon}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-        <Button title="Translate" onPress={handleTranslate} />
-        <Text style={styles.result}>Translated Text: {translatedText}</Text>
+        {isLodingTraslate ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <Button title="Translate" onPress={handleTranslate} />
+        )}
+        <Text style={styles.result}>{translatedText}</Text>
       </View>
       {/* buttons for languages */}
       <View style={styles.languageSelection}>
         <TouchableOpacity
           style={styles.languageButton}
           onPress={openFromLanguageModal}>
-          <Text>From: {fromLanguage}</Text>
+          <Text style={{fontSize: 20}}>{availableLanguages[fromLanguage]}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={interchangeLanguages}
@@ -278,7 +306,7 @@ const HomeScreen = () => {
         <TouchableOpacity
           style={styles.languageButton}
           onPress={openToLanguageModal}>
-          <Text>To: {toLanguage}</Text>
+          <Text style={{fontSize: 20}}>{availableLanguages[toLanguage]}</Text>
         </TouchableOpacity>
       </View>
       {/* From Language Selection Modal */}
@@ -293,7 +321,7 @@ const HomeScreen = () => {
                 key={language}
                 style={styles.languageModalButton}
                 onPress={() => handleFromLanguageSelect(language)}>
-                <Text>{language}</Text>
+                <Text>{availableLanguages[language]}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -311,7 +339,7 @@ const HomeScreen = () => {
                 key={language}
                 style={styles.languageModalButton}
                 onPress={() => handleToLanguageSelect(language)}>
-                <Text>{language}</Text>
+                <Text>{availableLanguages[language]}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -349,20 +377,22 @@ const styles = StyleSheet.create({
   },
   input: {
     width: 300,
-    height: 40,
+    height: 100,
     // borderColor: 'gray',
     // borderWidth: 1,
     // padding: 10,
     marginBottom: 10,
     borderRadius: 10,
+    fontSize: 30,
   },
   cancelIcon: {
     width: 40,
     height: 40,
+    marginTop: 35,
   },
   result: {
-    fontSize: 18,
-    marginTop: 20,
+    fontSize: 24,
+    marginTop: 80,
     color: 'black',
   },
   languageSelection: {
@@ -373,15 +403,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   languageButton: {
-    padding: 10,
-    margin: 5,
+    paddingLeft: 35,
+    paddingRight: 35,
+    paddingTop: 13,
+    paddingBottom: 13,
+
+    margin: 15,
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 5,
   },
   interchangeIcon: {
-    width: 20,
-    height: 20,
+    width: 40,
+    height: 40,
   },
 
   modalContainer: {

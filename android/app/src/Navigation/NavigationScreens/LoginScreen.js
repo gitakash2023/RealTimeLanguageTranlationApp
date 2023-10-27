@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Button,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
@@ -17,8 +18,7 @@ const LoginScreen = () => {
   // use input phone number
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // If null, no SMS has been sent
-  const [confirm, setConfirm] = useState(null);
+  const [isLodingLogin, setIsLodingLogin] = useState(false);
 
   //  function for handleCancelIconEmail
   const handleCancelIconPressEmail = () => {
@@ -30,10 +30,12 @@ const LoginScreen = () => {
   };
   // function  for handleLogin
   const handleLogin = () => {
+    setIsLodingLogin(true);
     auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
         console.log('Welcome ');
+        isLodingLogin(false);
         navigation.navigate('HomeScreen');
       })
       .catch(error => {
@@ -76,14 +78,16 @@ const LoginScreen = () => {
             onChangeText={text => setEmail(text)}
             style={styles.textInput}></TextInput>
         </View>
-        <View>
-          <TouchableOpacity onPress={handleCancelIconPressEmail}>
-            <Image
-              source={require('../../Image/cancelIcon.png')}
-              style={styles.cancelicon}
-            />
-          </TouchableOpacity>
-        </View>
+        {email.length > 0 && (
+          <View>
+            <TouchableOpacity onPress={handleCancelIconPressEmail}>
+              <Image
+                source={require('../../Image/cancelIcon.png')}
+                style={[styles.cancelicon, {marginLeft: 30}]}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
       <View style={[styles.inputFieldContainer, {marginTop: 10}]}>
         <View>
@@ -93,20 +97,26 @@ const LoginScreen = () => {
             onChangeText={text => setPassword(text)}
             style={styles.textInput}></TextInput>
         </View>
-        <View>
-          <TouchableOpacity onPress={handleCancelIconPressPassword}>
-            <Image
-              source={require('../../Image/cancelIcon.png')}
-              style={styles.cancelicon}
-            />
-          </TouchableOpacity>
-        </View>
+        {password.length > 0 && (
+          <View>
+            <TouchableOpacity onPress={handleCancelIconPressPassword}>
+              <Image
+                source={require('../../Image/cancelIcon.png')}
+                style={styles.cancelicon}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       <View style={styles.LoginView}>
-        <TouchableOpacity style={styles.LoginButton} onPress={handleLogin}>
-          <Text style={styles.LoginText}>Log in</Text>
-        </TouchableOpacity>
+        {isLodingLogin ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <TouchableOpacity style={styles.LoginButton} onPress={handleLogin}>
+            <Text style={styles.LoginText}>Log in</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <View>
         <TouchableOpacity onPress={navigateToSignup}>
@@ -145,16 +155,17 @@ const styles = StyleSheet.create({
   inputFieldContainer: {
     flexDirection: 'row',
     marginTop: 50,
-    marginLeft: 20,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginLeft: 30,
   },
   textInput: {
-    marginRight: 100,
+    // marginRight: 100,
   },
   cancelicon: {
     width: 20,
     height: 20,
+    marginRight: 20,
+    marginTop: 15,
   },
   LoginButton: {
     margin: 10,
