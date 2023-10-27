@@ -1,14 +1,24 @@
 import {View, Text, Image, StyleSheet} from 'react-native';
 import React, {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 const Splash = () => {
   const navigation = useNavigation();
   useEffect(() => {
-    // Simulate a delay (3 seconds) before navigating to the login screen
+    // Check if the user is already authenticated (registered)
+    const user = auth().currentUser;
+
+    // Simulate a delay (3 seconds) before navigating to the appropriate screen
     setTimeout(() => {
-      navigation.navigate('HomeScreen');
-    }, 3000);
+      if (user) {
+        // User is already registered, navigate to Home screen
+        navigation.navigate('HomeScreen');
+      } else {
+        // User is not registered, navigate to Signup screen
+        navigation.navigate('SignupScreen');
+      }
+    }, 2000);
   }, []);
 
   return (
