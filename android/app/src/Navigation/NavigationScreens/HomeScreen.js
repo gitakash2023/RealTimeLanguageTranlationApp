@@ -227,6 +227,9 @@ const HomeScreen = () => {
       })
       .catch(error => {
         console.log(error);
+      })
+      .finally(() => {
+        setIsLodingLogout(false); // Clear the logout in progress, whether it succeeded or failed
       });
   };
   //  handleCancel

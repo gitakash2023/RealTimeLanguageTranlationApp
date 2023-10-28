@@ -15,7 +15,7 @@ const translate = require('google-translate');
 
 const HistoryScreen = () => {
   const [historyData, setHistoryData] = useState([]);
-  const [favorites, setFavorites] = useState([]);
+  const [deletionInProgress, setDeletionInProgress] = useState(false);
 
   //
   useEffect(() => {
@@ -39,24 +39,34 @@ const HistoryScreen = () => {
       });
   }, []);
   // function for adding favorite
-  const handleFavorite = itemId => {
-    // Find the item that was clicked by its ID
-    const itemToFavorite = historyData.find(item => item.id === itemId);
+  const handleFavorite = async (itemId, isFavorite) => {
+    const translationRef = firestore().collection('translations').doc(itemId);
 
-    // Check if the item is not already in the favorites
-    if (!favorites.some(favItem => favItem.id === itemId)) {
-      // Add the item to the favorites array
-      setFavorites(prevFavorites => [...prevFavorites, itemToFavorite]);
+    try {
+      await translationRef.update({
+        isFavorite: !isFavorite,
+      });
+
+      console.log('Document updated successfully');
+    } catch (error) {
+      console.error('Error updating document: ', error);
     }
-    // Show an alert
-    Alert.alert(
-      'Item Added to Favorites',
-      'This translation has been added to your favorites.',
-    );
-    // Log the updated favorites array
   };
   // handle delete
-  const handleDelete = () => {};
+  const handleDelete = async itemId => {
+    setDeletionInProgress(true); // Set the deletion in progress
+
+    try {
+      const translationRef = firestore().collection('translations').doc(itemId);
+      await translationRef.delete();
+
+      console.log('Document deleted successfully');
+    } catch (error) {
+      console.error('Error deleting document: ', error);
+    } finally {
+      setDeletionInProgress(false); // Clear the deletion in progress, whether it succeeded or failed
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -71,17 +81,37 @@ const HistoryScreen = () => {
             <Text style={styles.inputText}>{item.inputText}</Text>
             <Text style={styles.translatedText}>{item.translatedText}</Text>
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity
-                style={styles.favoriteButton}
-                onPress={() => handleFavorite(item.id)}>
-                <Text style={styles.buttonText}>Favorite</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => handleDelete(item.id)}>
-                <Text style={styles.buttonText}>Delete</Text>
-              </TouchableOpacity>
+              <View>
+                <TouchableOpacity
+                  style={styles.favoriteButton}
+                  onPress={() => handleFavorite(item.id, item.isFavorite)}>
+                  {item.isFavorite ? (
+                    <Image
+                      source={require('../../Image/starFillIcon.png')}
+                      style={styles.starIcon}
+                    />
+                  ) : (
+                    <Image
+                      source={require('../../Image/starIcon.png')}
+                      style={styles.starIcon}
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
+              <View>
+                {deletionInProgress ? (
+                  <ActivityIndicator size="large" color="#0000ff" />
+                ) : (
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDelete(item.id)}>
+                    <Image
+                      source={require('../../Image/deleteIcon.png')}
+                      style={styles.deleteIcon}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           </View>
         )}

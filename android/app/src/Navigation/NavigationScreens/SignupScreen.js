@@ -43,10 +43,9 @@ const SignupScreen = () => {
         console.log('User account created & signed in!');
         console.log(res);
         setIsLodingSignUp(false);
-
-        navigation.navigate('HomeScreen');
         setEmail('');
         setPassword('');
+        navigation.navigate('HomeScreen');
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
@@ -56,9 +55,9 @@ const SignupScreen = () => {
         if (error.code === 'auth/invalid-email') {
           console.log('That email address is invalid!');
         }
-        setEmail('');
-        setPassword('');
-        console.error(error);
+      })
+      .finally(() => {
+        setIsLodingSignUp(false); // Clear the signup in progress, whether it succeeded or failed
       });
   };
 

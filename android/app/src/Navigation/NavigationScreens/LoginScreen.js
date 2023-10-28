@@ -35,7 +35,7 @@ const LoginScreen = () => {
       .signInWithEmailAndPassword(email, password)
       .then(() => {
         console.log('Welcome ');
-        isLodingLogin(false);
+        setIsLodingLogin(false);
         navigation.navigate('HomeScreen');
       })
       .catch(error => {
@@ -48,6 +48,9 @@ const LoginScreen = () => {
         }
 
         console.error(error);
+      })
+      .finally(() => {
+        setIsLodingLogin(false); // Clear the signin in progress, whether it succeeded or failed
       });
   };
   const navigateToSignup = () => {
