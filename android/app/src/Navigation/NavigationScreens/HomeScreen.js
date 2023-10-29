@@ -16,7 +16,6 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import {translate} from '@vitalets/google-translate-api';
-
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [text, setText] = useState('');
@@ -27,7 +26,6 @@ const HomeScreen = () => {
   const [isToModalVisible, setToModalVisible] = useState(false);
   const [isLodingTraslate, setIsLodingTranslate] = useState(false);
   const [isLodingLogout, setIsLodingLogout] = useState(false);
-
   const availableLanguages = {
     auto: 'Automatic',
     af: 'Afrikaans',
@@ -135,25 +133,6 @@ const HomeScreen = () => {
     yo: 'Yoruba',
     zu: 'Zulu',
   };
-
-  //  function for set user
-
-  // const fetchUserTranslations = () => {
-  //   firestore()
-  //     .collection('students')
-  //     // Filter results
-  //     .where('userId', '==', auth().currentUser.email)
-  //     .get()
-  //     .then(querySnapshot => {
-  //       console.log(querySnapshot.docs);
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // };
-  // useEffect(() => {
-  //   setUserData();
-  // }, []);
   //  handleTranslate
   const handleTranslate = async () => {
     if (!text || !fromLanguage || !toLanguage) {
@@ -161,12 +140,10 @@ const HomeScreen = () => {
       return;
     }
     setIsLodingTranslate(true);
-
     const result = await translate(text, {from: fromLanguage, to: toLanguage});
     setIsLodingTranslate(false);
     setTranslatedText(result.text);
     setFromLanguage(result.raw.src);
-
     firestore()
       .collection('translations')
       .add({
@@ -176,6 +153,7 @@ const HomeScreen = () => {
         translatedText: result.text,
         createdAt: new Date(),
         userId: auth().currentUser.email,
+        isFavorite: false,
       })
       .then(() => {
         console.log('Translation added to Firestore!');
@@ -186,7 +164,6 @@ const HomeScreen = () => {
 
     setText(''); // Clear the input field after translation
   };
-
   //  function for open from language
   const openFromLanguageModal = () => {
     setFromModalVisible(true);
@@ -195,7 +172,6 @@ const HomeScreen = () => {
   const openToLanguageModal = () => {
     setToModalVisible(true);
   };
-
   //  function for  FromLanguageSelect
   const handleFromLanguageSelect = language => {
     setFromLanguage(language);
@@ -236,7 +212,6 @@ const HomeScreen = () => {
   const handleCancel = () => {
     setText('');
   };
-
   return (
     <>
       <View style={styles.topIcons}>
@@ -259,7 +234,6 @@ const HomeScreen = () => {
           )}
         </View>
       </View>
-
       <View style={styles.container}>
         <View style={{flexDirection: 'row'}}>
           <View>
@@ -381,9 +355,6 @@ const styles = StyleSheet.create({
   input: {
     width: 300,
     height: 100,
-    // borderColor: 'gray',
-    // borderWidth: 1,
-    // padding: 10,
     marginBottom: 10,
     borderRadius: 10,
     fontSize: 30,
@@ -420,7 +391,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
-
   modalContainer: {
     backgroundColor: 'white',
     padding: 10,
@@ -434,5 +404,4 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
 });
-
 export default HomeScreen;

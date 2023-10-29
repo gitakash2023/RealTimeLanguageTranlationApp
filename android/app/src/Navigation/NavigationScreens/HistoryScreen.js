@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -6,68 +6,70 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-
 // If you've installed from GitHub, do:
 const translate = require('google-translate');
-
 const HistoryScreen = () => {
   const [historyData, setHistoryData] = useState([]);
   const [deletionInProgress, setDeletionInProgress] = useState(false);
-
-  //
-  useEffect(() => {
-    // Query Firestore to get the data
+  const currentDocId = useRef('');
+  // function for retreiveTranslations
+  const retreiveTranslations = () => {
     firestore()
       .collection('translations')
       // Filter results
       .where('userId', '==', auth().currentUser.email)
-      // .orderBy('createdAt', 'desc')
       .get()
       .then(querySnapshot => {
         const data = [];
         querySnapshot.forEach(documentSnapshot => {
-          data.push(documentSnapshot.data());
+          const documentData = documentSnapshot.data();
+          documentData.id = documentSnapshot.id;
+          console.log({documentData});
+          data.push(documentData);
         });
-
+        console.log({data: data[0]});
         setHistoryData(data);
       })
       .catch(error => {
         console.log(error);
       });
+  };
+  useEffect(() => {
+    retreiveTranslations();
   }, []);
   // function for adding favorite
   const handleFavorite = async (itemId, isFavorite) => {
     const translationRef = firestore().collection('translations').doc(itemId);
-
+    console.log({translationRef});
     try {
       await translationRef.update({
         isFavorite: !isFavorite,
       });
-
+      retreiveTranslations();
       console.log('Document updated successfully');
     } catch (error) {
       console.error('Error updating document: ', error);
     }
   };
-  // handle delete
+  //  function for  delete items
   const handleDelete = async itemId => {
+    currentDocId.current = itemId;
     setDeletionInProgress(true); // Set the deletion in progress
-
     try {
       const translationRef = firestore().collection('translations').doc(itemId);
       await translationRef.delete();
-
-      console.log('Document deleted successfully');
+      retreiveTranslations();
     } catch (error) {
       console.error('Error deleting document: ', error);
     } finally {
       setDeletionInProgress(false); // Clear the deletion in progress, whether it succeeded or failed
     }
   };
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -99,7 +101,7 @@ const HistoryScreen = () => {
                 </TouchableOpacity>
               </View>
               <View>
-                {deletionInProgress ? (
+                {deletionInProgress && currentDocId.current == item.id ? (
                   <ActivityIndicator size="large" color="#0000ff" />
                 ) : (
                   <TouchableOpacity
@@ -119,7 +121,6 @@ const HistoryScreen = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -154,20 +155,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  favoriteButton: {
-    backgroundColor: '#3498db',
-    padding: 10,
-    borderRadius: 6,
+  deleteIcon: {
+    width: 24,
+    height: 24,
   },
-  deleteButton: {
-    backgroundColor: '#e74c3c',
-    padding: 10,
-    borderRadius: 6,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
+  starIcon: {
+    width: 24,
+    height: 24,
   },
 });
 export default HistoryScreen;

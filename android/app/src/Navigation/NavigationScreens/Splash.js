@@ -8,7 +8,6 @@ const Splash = () => {
   useEffect(() => {
     // Check if the user is already authenticated (registered)
     const user = auth().currentUser;
-
     // Simulate a delay (3 seconds) before navigating to the appropriate screen
     setTimeout(() => {
       if (user) {
@@ -20,7 +19,6 @@ const Splash = () => {
       }
     }, 2000);
   }, []);
-
   return (
     <View>
       <View style={styles.splashImageContainer}>
@@ -43,5 +41,4 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Center horizontally
   },
 });
-
 export default Splash;

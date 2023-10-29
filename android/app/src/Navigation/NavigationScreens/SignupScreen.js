@@ -12,16 +12,14 @@ import {
 import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
-
 const SignupScreen = () => {
   // for navigation
   const navigation = useNavigation();
-  //
+  // declared states for input fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // Loding
+  // state for showing loding
   const [isLodingSignUp, setIsLodingSignUp] = useState(false);
-
   //  function for handleCancelIconEmail
   const handleCancelIconPressEmail = () => {
     setEmail('');
@@ -30,7 +28,7 @@ const SignupScreen = () => {
   const handleCancelIconPressPassword = () => {
     setPassword('');
   };
-  // handleLoginNow
+  // function for handleLoginNow
   const navigateToLoginScreen = () => {
     navigation.navigate('LoginScreen');
   };
@@ -60,7 +58,6 @@ const SignupScreen = () => {
         setIsLodingSignUp(false); // Clear the signup in progress, whether it succeeded or failed
       });
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.main}>
@@ -161,15 +158,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
-
   inputFieldContainer: {
     flexDirection: 'row',
     marginTop: 50,
     justifyContent: 'space-between',
     marginLeft: 30,
-  },
-  textInput: {
-    // marginTop: 15,
   },
   cancelicon: {
     width: 20,
@@ -196,5 +189,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
 export default SignupScreen;
