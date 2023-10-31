@@ -10,12 +10,14 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  NativeEventEmitter,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import {translate} from '@vitalets/google-translate-api';
+import Voice from '@react-native-voice/voice';
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [text, setText] = useState('');
@@ -26,6 +28,9 @@ const HomeScreen = () => {
   const [isToModalVisible, setToModalVisible] = useState(false);
   const [isLodingTraslate, setIsLodingTranslate] = useState(false);
   const [isLodingLogout, setIsLodingLogout] = useState(false);
+  const [started, setStarted] = useState('');
+  const [ended, setEnded] = useState('');
+  const [results, setResults] = useState([]);
   const availableLanguages = {
     auto: 'Automatic',
     af: 'Afrikaans',
@@ -212,8 +217,61 @@ const HomeScreen = () => {
   const handleCancel = () => {
     setText('');
   };
+  //
+  useEffect(() => {
+    Voice.onSpeechStart = onSpeechStart;
+    Voice.onSpeechEnd = onSpeechEnd;
+    Voice.onSpeechResults = onSpeechResults;
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+  const onSpeechStart = e => {
+    console.log(e);
+    setStarted('!');
+  };
+  const onSpeechEnd = e => {
+    console.log(e);
+    setEnded('@');
+    console.log()
+  };
+  const onSpeechResults = e => {
+    console.log(e.value);
+    setResults(e.value);
+    console.log('trigger on speech result');
+  };
+
+  const startRecognizing = async () => {
+    try {
+      await Voice.start('en-US');
+      console.log('sucess');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const endRecognizing = async () => {
+    try {
+      await Voice.stop();
+      await Voice.destroy();
+      console.log('cl gya ');
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <>
+      <View>
+        <TouchableOpacity onPress={startRecognizing}>
+          <Text>miceStart vali button</Text>
+        </TouchableOpacity>
+        <Text>Started {started}</Text>
+        <Text>ended{ended}</Text>
+        <TouchableOpacity onPress={endRecognizing}>
+          <Text>end vali button</Text>
+        </TouchableOpacity>
+        <ScrollView></ScrollView>
+      </View>
       <View style={styles.topIcons}>
         <TouchableOpacity onPress={handleForHistory}>
           <Image
