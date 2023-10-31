@@ -3,9 +3,7 @@ import React from 'react';
 import Navigation from './android/app/src/Navigation/Navigation';
 
 const App = () => {
-  return (
-    <Navigation/>
-  );
+  return <Navigation />;
 };
 
 export default App;
