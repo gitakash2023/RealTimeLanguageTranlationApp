@@ -222,11 +222,15 @@ const HomeScreen = () => {
     Voice.onSpeechStart = onSpeechStart;
     Voice.onSpeechEnd = onSpeechEnd;
     Voice.onSpeechResults = onSpeechResults;
+    Voice.onSpeechError = onSpeechError;
 
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
   }, []);
+  const onSpeechError = e => {
+    console.log(e);
+  };
   const onSpeechStart = e => {
     console.log(e);
     setStarted('!');
@@ -234,7 +238,7 @@ const HomeScreen = () => {
   const onSpeechEnd = e => {
     console.log(e);
     setEnded('@');
-    console.log()
+    console.log();
   };
   const onSpeechResults = e => {
     console.log(e.value);
